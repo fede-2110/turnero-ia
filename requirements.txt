@@ -1,0 +1,6 @@
+openai
+flask
+flask_sqlalchemy
+pytest
+python-dotenv
+pymysql
