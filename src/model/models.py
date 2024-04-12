@@ -1,85 +1,85 @@
 # src/model/models.py
-from src.model.db import db
+from .db import db
 
 class Paciente(db.Model):
-    __tablename__ = 'Pacientes'
+    __tablename__ = 'paciente'
     
-    Id = db.Column(db.Integer, primary_key=True)
-    Nombre = db.Column(db.String(255), nullable=False)
-    Apellido = db.Column(db.String(255), nullable=False)
-    DNI = db.Column(db.String(20), unique=True, nullable=False)
-    FechaDeNacimiento = db.Column(db.Date, nullable=False)
-    Telefono = db.Column(db.String(20))
-    Email = db.Column(db.String(255))
-    FechaBaja = db.Column(db.DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(255), nullable=False)
+    apellido = db.Column(db.String(255), nullable=False)
+    dni = db.Column(db.String(20), unique=True, nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    telefono = db.Column(db.String(20))
+    email = db.Column(db.String(255))
+    fecha_baja = db.Column(db.DateTime)
 
 class Medico(db.Model):
-    __tablename__ = 'Medicos'
+    __tablename__ = 'medico'
     
-    Id = db.Column(db.Integer, primary_key=True)
-    Nombre = db.Column(db.String(255), nullable=False)
-    Apellido = db.Column(db.String(255), nullable=False)
-    Telefono = db.Column(db.String(20))
-    Email = db.Column(db.String(255))
-    FechaBaja = db.Column(db.DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(255), nullable=False)
+    apellido = db.Column(db.String(255), nullable=False)
+    telefono = db.Column(db.String(20))
+    email = db.Column(db.String(255))
+    fecha_baja = db.Column(db.DateTime)
 
 class Especialidad(db.Model):
-    __tablename__ = 'Especialidades'
+    __tablename__ = 'especialidad'
     
-    Id = db.Column(db.Integer, primary_key=True)
-    NombreEspecialidad = db.Column(db.String(255), nullable=False)
-    Descripcion = db.Column(db.Text)
-    FechaBaja = db.Column(db.DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    nombre_especialidad = db.Column(db.String(255), nullable=False)
+    descripcion = db.Column(db.Text)
+    fecha_baja = db.Column(db.DateTime)
 
 class CentroAtencion(db.Model):
-    __tablename__ = 'CentrosAtencion'
+    __tablename__ = 'centro_atencion'
     
-    Id = db.Column(db.Integer, primary_key=True)
-    NombreCentro = db.Column(db.String(255), nullable=False)
-    Direccion = db.Column(db.String(255), nullable=False)
-    Telefono = db.Column(db.String(20))
-    FechaBaja = db.Column(db.DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    nombre_centro = db.Column(db.String(255), nullable=False)
+    direccion = db.Column(db.String(255), nullable=False)
+    telefono = db.Column(db.String(20))
+    fecha_baja = db.Column(db.DateTime)
 
 class Consultorio(db.Model):
-    __tablename__ = 'Consultorios'
+    __tablename__ = 'consultorio'
     
-    Id = db.Column(db.Integer, primary_key=True)
-    CentroId = db.Column(db.Integer, db.ForeignKey('CentrosAtencion.Id'), nullable=False)
-    NumeroConsultorio = db.Column(db.String(50))
-    FechaBaja = db.Column(db.DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    centro_id = db.Column(db.Integer, db.ForeignKey('centro_atencion.id'), nullable=False)
+    numero_consultorio = db.Column(db.String(50))
+    fecha_baja = db.Column(db.DateTime)
 
 class Cita(db.Model):
-    __tablename__ = 'Citas'
+    __tablename__ = 'cita'
     
-    Id = db.Column(db.Integer, primary_key=True)
-    PacienteId = db.Column(db.Integer, db.ForeignKey('Pacientes.Id'), nullable=False)
-    MedicoId = db.Column(db.Integer, db.ForeignKey('Medicos.Id'), nullable=False)
-    CentroId = db.Column(db.Integer, db.ForeignKey('CentrosAtencion.Id'), nullable=False)
-    ConsultorioId = db.Column(db.Integer, db.ForeignKey('Consultorios.Id'), nullable=True)
-    FechaHora = db.Column(db.DateTime, nullable=False)
-    Estado = db.Column(db.String(50))
-    MotivoConsulta = db.Column(db.Text)
-    FechaBaja = db.Column(db.DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    paciente_id = db.Column(db.Integer, db.ForeignKey('paciente.id'), nullable=False)
+    medico_id = db.Column(db.Integer, db.ForeignKey('medico.id'), nullable=False)
+    centro_id = db.Column(db.Integer, db.ForeignKey('centro_atencion.id'), nullable=False)
+    consultorio_id = db.Column(db.Integer, db.ForeignKey('consultorio.id'), nullable=True)
+    fecha_hora = db.Column(db.DateTime, nullable=False)
+    estado = db.Column(db.String(50))
+    motivo_consulta = db.Column(db.Text)
+    fecha_baja = db.Column(db.DateTime)
 
 class MedicoEspecialidad(db.Model):
-    __tablename__ = 'MedicosEspecialidades'
+    __tablename__ = 'medico_especialidad'
     
-    MedicoId = db.Column(db.Integer, db.ForeignKey('Medicos.Id'), primary_key=True)
-    EspecialidadId = db.Column(db.Integer, db.ForeignKey('Especialidades.Id'), primary_key=True)
+    medico_id = db.Column(db.Integer, db.ForeignKey('medico.id'), primary_key=True)
+    especialidad_id = db.Column(db.Integer, db.ForeignKey('especialidad.id'), primary_key=True)
 
 class MedicoCentro(db.Model):
-    __tablename__ = 'MedicosCentros'
+    __tablename__ = 'medico_centro'
     
-    MedicoId = db.Column(db.Integer, db.ForeignKey('Medicos.Id'), primary_key=True)
-    CentroId = db.Column(db.Integer, db.ForeignKey('CentrosAtencion.Id'), primary_key=True)
+    medico_id = db.Column(db.Integer, db.ForeignKey('medico.id'), primary_key=True)
+    centro_id = db.Column(db.Integer, db.ForeignKey('centro_atencion.id'), primary_key=True)
 
 class HorarioAtencion(db.Model):
-    __tablename__ = 'HorariosAtencion'
+    __tablename__ = 'horario_atencion'
     
-    Id = db.Column(db.Integer, primary_key=True)
-    MedicoId = db.Column(db.Integer, db.ForeignKey('Medicos.Id'), nullable=False)
-    CentroId = db.Column(db.Integer, db.ForeignKey('CentrosAtencion.Id'), nullable=False)
-    DiaSemana = db.Column(db.String(10), nullable=False)
-    HoraInicio = db.Column(db.Time, nullable=False)
-    HoraFin = db.Column(db.Time, nullable=False)
-    FechaBaja = db.Column(db.DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    medico_id = db.Column(db.Integer, db.ForeignKey('medico.id'), nullable=False)
+    centro_id = db.Column(db.Integer, db.ForeignKey('centro_atencion.id'), nullable=False)
+    dia_semana = db.Column(db.String(10), nullable=False)
+    hora_inicio = db.Column(db.Time, nullable=False)
+    hora_fin = db.Column(db.Time, nullable=False)
+    fecha_baja = db.Column(db.DateTime)

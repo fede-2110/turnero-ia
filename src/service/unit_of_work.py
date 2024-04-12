@@ -1,6 +1,6 @@
 # src/service/unit_of_work.py
 from contextlib import contextmanager
-from app import db
+from src.model.db import db
 
 class UnitOfWork:
     @contextmanager

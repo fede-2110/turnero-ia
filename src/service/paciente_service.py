@@ -21,8 +21,8 @@ class PacienteService:
         # Igual que arriba, solo lectura
         return self.repo.get_all()
 
-    def obtener_pacientes_paginados(self, page, per_page, endpoint):
-        return paginate(Paciente.query, page, per_page, endpoint)
+    def obtener_pacientes_paginados(self, page, per_page, schema, endpoint):
+        return paginate(Paciente.query, page=page, per_page=per_page, schema=schema, endpoint=endpoint)
     
     def actualizar_paciente(self, paciente_actualizado):
         with self.uow.start():

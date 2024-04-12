@@ -2,98 +2,98 @@
 CREATE DATABASE IF NOT EXISTS turneroAI;
 USE turneroAI;
 
--- Tabla de Pacientes
-CREATE TABLE IF NOT EXISTS Pacientes (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(255) NOT NULL,
-    Apellido VARCHAR(255) NOT NULL,
-    DNI VARCHAR(20) UNIQUE NOT NULL,
-    FechaDeNacimiento DATE NOT NULL,
-    Telefono VARCHAR(20),
-    Email VARCHAR(255),
-    FechaBaja DATETIME NULL
+-- Tabla de Paciente
+CREATE TABLE IF NOT EXISTS Paciente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    dni VARCHAR(20) UNIQUE NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    telefono VARCHAR(20),
+    email VARCHAR(255),
+    fecha_baja DATETIME NULL
 );
 
--- Tabla de Médicos
-CREATE TABLE IF NOT EXISTS Medicos (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(255) NOT NULL,
-    Apellido VARCHAR(255) NOT NULL,
-    Telefono VARCHAR(20),
-    Email VARCHAR(255),
-    FechaBaja DATETIME NULL
+-- Tabla de Médico
+CREATE TABLE IF NOT EXISTS Medico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    telefono VARCHAR(20),
+    email VARCHAR(255),
+    fecha_baja DATETIME NULL
 );
 
--- Tabla de Especialidades Médicas
-CREATE TABLE IF NOT EXISTS Especialidades (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    NombreEspecialidad VARCHAR(255) NOT NULL,
-    Descripcion TEXT,
-    FechaBaja DATETIME NULL
+-- Tabla de Especialidad Médica
+CREATE TABLE IF NOT EXISTS Especialidad (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_especialidad VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+    fecha_baja DATETIME NULL
 );
 
--- Tabla de Centros de Atención
-CREATE TABLE IF NOT EXISTS CentrosAtencion (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    NombreCentro VARCHAR(255) NOT NULL,
-    Direccion VARCHAR(255) NOT NULL,
-    Telefono VARCHAR(20),
-    FechaBaja DATETIME NULL
+-- Tabla de Centro de Atención
+CREATE TABLE IF NOT EXISTS CentroAtencion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_centro VARCHAR(255) NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    telefono VARCHAR(20),
+    fecha_baja DATETIME NULL
 );
 
--- Tabla de Consultorios
-CREATE TABLE IF NOT EXISTS Consultorios (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    CentroId INT,
-    NumeroConsultorio VARCHAR(50),
-    FechaBaja DATETIME NULL,
-    FOREIGN KEY (CentroId) REFERENCES CentrosAtencion(Id) ON DELETE CASCADE
+-- Tabla de Consultorio
+CREATE TABLE IF NOT EXISTS Consultorio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    centro_id INT,
+    numero_consultorio VARCHAR(50),
+    fecha_baja DATETIME NULL,
+    FOREIGN KEY (centro_id) REFERENCES CentroAtencion(id) ON DELETE CASCADE
 );
 
--- Tabla de Citas
-CREATE TABLE IF NOT EXISTS Citas (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    PacienteId INT,
-    MedicoId INT,
-    CentroId INT,
-    ConsultorioId INT NULL, -- Opcional inicialmente
-    FechaHora DATETIME NOT NULL,
-    Estado VARCHAR(50),
-    MotivoConsulta TEXT,
-    FechaBaja DATETIME NULL,
-    FOREIGN KEY (PacienteId) REFERENCES Pacientes(Id) ON DELETE CASCADE,
-    FOREIGN KEY (MedicoId) REFERENCES Medicos(Id) ON DELETE CASCADE,
-    FOREIGN KEY (CentroId) REFERENCES CentrosAtencion(Id),
-    FOREIGN KEY (ConsultorioId) REFERENCES Consultorios(Id) ON DELETE SET NULL
+-- Tabla de Cita
+CREATE TABLE IF NOT EXISTS Cita (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    paciente_id INT,
+    medico_id INT,
+    centro_id INT,
+    consultorio_id INT NULL, -- Opcional inicialmente
+    fecha_hora DATETIME NOT NULL,
+    estado VARCHAR(50),
+    motivo_consulta TEXT,
+    fecha_baja DATETIME NULL,
+    FOREIGN KEY (paciente_id) REFERENCES Paciente(id) ON DELETE CASCADE,
+    FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE,
+    FOREIGN KEY (centro_id) REFERENCES CentroAtencion(id),
+    FOREIGN KEY (consultorio_id) REFERENCES Consultorio(id) ON DELETE SET NULL
 );
 
--- Tabla MédicosEspecialidades (Relación Muchos a Muchos)
-CREATE TABLE IF NOT EXISTS MedicosEspecialidades (
-    MedicoId INT,
-    EspecialidadId INT,
-    PRIMARY KEY (MedicoId, EspecialidadId),
-    FOREIGN KEY (MedicoId) REFERENCES Medicos(Id) ON DELETE CASCADE,
-    FOREIGN KEY (EspecialidadId) REFERENCES Especialidades(Id) ON DELETE CASCADE
+-- Tabla MédicoEspecialidades (Relación Muchos a Muchos)
+CREATE TABLE IF NOT EXISTS MedicoEspecialidad (
+    medico_id INT,
+    especialidad_id INT,
+    PRIMARY KEY (medico_id, especialidad_id),
+    FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE,
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id) ON DELETE CASCADE
 );
 
--- Tabla MédicosCentros (Relación Muchos a Muchos)
-CREATE TABLE IF NOT EXISTS MedicosCentros (
-    MedicoId INT,
-    CentroId INT,
-    PRIMARY KEY (MedicoId, CentroId),
-    FOREIGN KEY (MedicoId) REFERENCES Medicos(Id) ON DELETE CASCADE,
-    FOREIGN KEY (CentroId) REFERENCES CentrosAtencion(Id) ON DELETE CASCADE
+-- Tabla MédicoCentros (Relación Muchos a Muchos)
+CREATE TABLE IF NOT EXISTS MedicoCentro (
+    medico_id INT,
+    centro_id INT,
+    PRIMARY KEY (medico_id, centro_id),
+    FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE,
+    FOREIGN KEY (centro_id) REFERENCES CentroAtencion(id) ON DELETE CASCADE
 );
 
--- Tabla Horarios Atención
-CREATE TABLE IF NOT EXISTS HorariosAtencion (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    MedicoId INT,
-    CentroId INT,
-    DiaSemana VARCHAR(10),
-    HoraInicio TIME,
-    HoraFin TIME,
-    FechaBaja DATETIME NULL,
-    FOREIGN KEY (MedicoId) REFERENCES Medicos(Id) ON DELETE CASCADE,
-    FOREIGN KEY (CentroId) REFERENCES CentrosAtencion(Id) ON DELETE CASCADE
+-- Tabla Horario Atención
+CREATE TABLE IF NOT EXISTS HorarioAtencion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    medico_id INT,
+    centro_id INT,
+    dia_semana VARCHAR(10),
+    hora_inicio TIME,
+    hora_fin TIME,
+    fecha_baja DATETIME NULL,
+    FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE,
+    FOREIGN KEY (centro_id) REFERENCES CentroAtencion(id) ON DELETE CASCADE
 );

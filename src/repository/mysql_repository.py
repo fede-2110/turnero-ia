@@ -1,6 +1,6 @@
 from src.repository.repository_interface import IRepository
 from datetime import datetime, timezone
-from app import db
+from src.model.db import db
 
 class MysqlRepository(IRepository):
     def __init__(self, model):
@@ -10,10 +10,10 @@ class MysqlRepository(IRepository):
         db.session.add(entity)
 
     def get_by_id(self, id):
-        return db.session.query(self.model).filter_by(id=id, FechaBaja=None).first()
+        return db.session.query(self.model).filter_by(id=id, fecha_baja=None).first()
     
     def get_all(self):
-        return db.session.query(self.model).filter(FechaBaja=None).all()
+        return db.session.query(self.model).filter(fecha_baja=None).all()
 
     def update(self, entity):
         db.session.merge(entity)
@@ -26,3 +26,6 @@ class MysqlRepository(IRepository):
             
     def get_by_query(self, query):
         return db.session.execute(query).all()
+    
+    def list(self):
+        return self.get_all()

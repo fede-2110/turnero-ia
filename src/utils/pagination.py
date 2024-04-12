@@ -1,9 +1,9 @@
 # src/utils/pagination.py
 from flask import url_for, request
 
-def paginate(query, page, per_page, endpoint, **kwargs):
-    pagination = query.paginate(page, per_page, error_out=False)
-    items = pagination.items
+def paginate(query, page, per_page,schema, endpoint, **kwargs):
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    items = schema.dump(pagination.items, many=True)
 
     urls = {
         'self': url_for(endpoint, page=page, per_page=per_page, _external=True, **kwargs),

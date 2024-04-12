@@ -4,3 +4,6 @@ flask_sqlalchemy
 pytest
 python-dotenv
 pymysql
+flask-restx
+marshmallow
+marshmallow_sqlalchemy 
