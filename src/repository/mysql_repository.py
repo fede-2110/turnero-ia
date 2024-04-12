@@ -21,7 +21,7 @@ class MysqlRepository(IRepository):
     def delete(self, entity):
         # Actualiza FechaBaja en lugar de eliminar el registro físicamente
         if entity:
-            entity.FechaBaja = datetime.now(timezone.utc)
+            entity.fecha_baja = datetime.now(timezone.utc)
             db.session.add(entity)
             
     def get_by_query(self, query):
