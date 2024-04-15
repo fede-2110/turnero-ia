@@ -19,7 +19,7 @@ class MysqlRepository(IRepository):
         db.session.merge(entity)
 
     def delete(self, entity):
-        # Actualiza FechaBaja en lugar de eliminar el registro físicamente
+        # Actualiza fecha_baja en lugar de eliminar el registro físicamente
         if entity:
             entity.fecha_baja = datetime.now(timezone.utc)
             db.session.add(entity)

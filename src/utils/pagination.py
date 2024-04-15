@@ -2,7 +2,8 @@
 from flask import url_for, request
 
 def paginate(query, page, per_page,schema, endpoint, **kwargs):
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    active_query = query.filter(schema.Meta.model.fecha_baja == None)
+    pagination = active_query.paginate(page=page, per_page=per_page, error_out=False)
     items = schema.dump(pagination.items, many=True)
 
     urls = {
