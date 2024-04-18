@@ -33,7 +33,7 @@ class ChatCreate(Resource):
 @chat_ns.param('thread_id', 'El ID del thread de la conversación')
 class ChatUpdate(Resource):
     @chat_ns.doc('update_chat')
-    @chat_ns.expect(chat_model)  # Asegúrate de que el modelo de chat es adecuado para enviar mensajes
+    @chat_ns.expect(chat_model)
     def post(self, thread_id):
         """Envía un mensaje al asistente en un thread existente y obtiene la respuesta"""
         data = request.get_json()
@@ -58,13 +58,15 @@ class ChatUpdate(Resource):
             while run.status != "completed":
                 run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
                 time.sleep(1)
-                
+            
             # Obtener la última respuesta del asistente
             if run.status == "completed":
                 message_response = client.beta.threads.messages.list(thread_id=thread_id)
                 # Tomar el último mensaje generado por el asistente
                 latest_message = message_response.data[0]  
                 return ApiResponse.success(data={'message': latest_message.content[0].text.value})
+            elif run.status == "requires_action":
+                print("aca llamaria a algo")
             else:
                 return ApiResponse.client_error(message="La solicitud no se completó correctamente.", status=424)
         except Exception as e:
