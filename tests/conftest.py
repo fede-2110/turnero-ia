@@ -1,7 +1,9 @@
 # conftest.py
 import pytest
 from flask import Flask
+from flask_restx import Api
 from src.model.db import db
+from src.controller.chat_controller import chat_ns
 
 @pytest.fixture(scope='session')
 def app():
@@ -11,6 +13,9 @@ def app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SERVER_NAME'] = 'localhost:5000'
     db.init_app(app)
+    
+    api = Api(app)
+    api.add_namespace(chat_ns)
     
     with app.app_context():
         db.create_all()
@@ -27,4 +32,3 @@ def session(app):
         db.session.rollback()  # Roll back to savepoint or transaction start
         db.drop_all()          # Eliminar todas las tablas
         db.create_all()        # Recrear las tablas
-

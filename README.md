@@ -1,6 +1,6 @@
-# CliniCall AI
+# HeathMate
 
-CliniCall AI es una solución avanzada diseñada para automatizar y gestionar las interacciones con pacientes en entornos médicos, reemplazando las funciones tradicionales de los asistentes y telefonistas en consultorios. Este sistema utiliza inteligencia artificial para reservar citas, tomar notas de requerimientos específicos como zonas, días, horarios y detalles de obras sociales, todo a través de un interfaz de chatbot intuitivo.
+HealthMate es una solución avanzada diseñada para automatizar y gestionar las interacciones con pacientes en entornos médicos, reemplazando las funciones tradicionales de los asistentes y telefonistas en consultorios. Este sistema utiliza inteligencia artificial para reservar citas, tomar notas de requerimientos específicos como zonas, días, horarios y detalles de obras sociales, todo a través de un interfaz de chatbot intuitivo.
 
 ## Índice
 
