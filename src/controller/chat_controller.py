@@ -3,17 +3,18 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from src.utils.api_response import ApiResponse
 from src.schemas.chat_schema import ChatSchema
-from openai import OpenAI
-import os
-import time
-
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+from src.service.paciente_service import PacienteService
+from src.schemas.paciente_schema import PacienteSchema
+from src.service.chat_service import ChatService
 
 chat_ns = Namespace('chat', description='Operaciones relacionadas con el chat')
 chat_schema = ChatSchema()
 chat_model = chat_ns.model('Chat', {
     'message': fields.String(required=True, description='Mensaje del usuario al chat')
 })
+paciente_service = PacienteService()
+chat_service = ChatService()
+paciente_schema = PacienteSchema()
 
 @chat_ns.route('/create')
 class ChatCreate(Resource):
@@ -21,11 +22,11 @@ class ChatCreate(Resource):
     def post(self):
         """Inicia una nueva conversación con el asistente de IA"""
         try:
-            # Crear un nuevo thread
-            thread = client.beta.threads.create()
-
-            # Faltaria persistirlo, proxima iteracion, evaluar si conviene.
-            return ApiResponse.success(data={'thread_id': thread.id}, message="Thread iniciado con éxito.")
+            thread = chat_service.create_thread()
+            if thread:
+                return ApiResponse.success(data={'thread_id': thread.id}, message="Thread creado con éxito.")
+            else:
+                return ApiResponse.client_error(message="No se pudo crear el thread.", status=400)
         except Exception as e:
             return ApiResponse.server_error(message=str(e))
 
@@ -40,35 +41,9 @@ class ChatUpdate(Resource):
         errors = chat_schema.validate(data)
         if errors:
             return ApiResponse.client_error(message=str(errors), status=400)
-
         user_input = data['message']
         try:
-            # Añadir el mensaje del usuario al thread
-            client.beta.threads.messages.create(
-                thread_id=thread_id,
-                role="user",
-                content=user_input
-            )
-            # Ejecutar el asistente para procesar el mensaje y generar una respuesta
-            run = client.beta.threads.runs.create(
-                thread_id=thread_id,
-                assistant_id=os.environ.get("ASSISTANT_ID")
-            )
-            # Esperar a que la ejecución del asistente complete
-            while run.status != "completed":
-                run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
-                time.sleep(1)
-            
-            # Obtener la última respuesta del asistente
-            if run.status == "completed":
-                message_response = client.beta.threads.messages.list(thread_id=thread_id)
-                # Tomar el último mensaje generado por el asistente
-                latest_message = message_response.data[0]  
-                return ApiResponse.success(data={'message': latest_message.content[0].text.value})
-            elif run.status == "requires_action":
-                print("aca llamaria a algo")
-            else:
-                return ApiResponse.client_error(message="La solicitud no se completó correctamente.", status=424)
+            result = chat_service.process_message(thread_id, user_input)
+            return ApiResponse.success(data={'message': result})
         except Exception as e:
             return ApiResponse.server_error(message=str(e))
-

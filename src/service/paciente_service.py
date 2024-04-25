@@ -5,6 +5,8 @@ from src.model.models import Paciente
 from src.utils.pagination import paginate
 from src.model.db import db
 from src.utils.validation_utils import validar_datos_paciente
+from src.utils.cleanup_utils import clean_dni
+
 class PacienteService:
     def __init__(self):
         self.repo = MysqlRepository(Paciente)
@@ -18,8 +20,11 @@ class PacienteService:
 
     def obtener_paciente_por_id(self, paciente_id):
         # No se necesita UoW ya que es solo una operación de lectura
-        return self.repo.get_by_id(paciente_id)
-
+        paciente = self.repo.get_by_id(paciente_id)
+        if paciente and paciente.fecha_baja is None:
+            return paciente
+        return None
+    
     def obtener_pacientes(self):
         # Igual que arriba, solo lectura
         return self.repo.get_all()
@@ -52,8 +57,14 @@ class PacienteService:
 
     def eliminar_paciente(self, paciente_id):
         paciente_a_eliminar = self.obtener_paciente_por_id(paciente_id)
+        # TODO: validaciones que el paciente no tenga turnos tomados
         if paciente_a_eliminar:
             with self.uow.start():
                 self.repo.delete(paciente_a_eliminar)
                 return True
         return False 
+    
+    def obtener_paciente_por_dni(self, parametros):
+        dni = clean_dni(parametros)
+        consulta = db.session.query(Paciente).filter(Paciente.fecha_baja == None, Paciente.dni == dni)
+        return consulta.first()

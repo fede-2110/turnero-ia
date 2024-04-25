@@ -12,15 +12,20 @@ class ConsultorioService:
     def agregar_consultorio(self, nuevo_consultorio):
         with self.uow.start():
             self.repo.add(nuevo_consultorio)
+            return nuevo_consultorio
 
     def obtener_consultorio_por_id(self, consultorio_id):
-        return self.repo.get_by_id(consultorio_id)
+        consultorio = self.repo.get_by_id(consultorio_id)
+        if consultorio and consultorio.fecha_baja is None:
+            return consultorio
+        return None
 
     def obtener__consultorios(self):
         return self.repo.get_all()
 
     def obtener_consultorios_paginados(self, page, per_page, endpoint):
-        return paginate(Consultorio.query, page, per_page, endpoint)
+        return paginate(Consultorio.query.filter(Consultorio.fecha_baja == None), page, per_page, endpoint)
+
 
     def actualizar_consultorio(self, consultorio_actualizado):
         with self.uow.start():
@@ -32,3 +37,5 @@ class ConsultorioService:
         if consultorio_a_eliminar:
             with self.uow.start():
                 self.repo.delete(consultorio_a_eliminar)
+                return consultorio_a_eliminar
+        return None

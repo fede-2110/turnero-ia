@@ -1,14 +1,14 @@
 -- Eliminar tablas de relaciones muchos a muchos primero para evitar conflictos de clave foránea
-DROP TABLE IF EXISTS MedicoEspecialidad;
-DROP TABLE IF EXISTS MedicoCentro;
-DROP TABLE IF EXISTS HorarioAtencion;
+DROP TABLE IF EXISTS medico_especialidad;
+DROP TABLE IF EXISTS medico_centro;
+DROP TABLE IF EXISTS horario_atencion;
 
 -- Ahora, eliminar las tablas que contienen claves foráneas
-DROP TABLE IF EXISTS Cita;
-DROP TABLE IF EXISTS Consultorio;
+DROP TABLE IF EXISTS cita;
+DROP TABLE IF EXISTS consultorio;
 
 -- Finalmente, eliminar las tablas restantes que solo contienen datos o son referenciadas por otras
-DROP TABLE IF EXISTS Paciente;
-DROP TABLE IF EXISTS Medico;
-DROP TABLE IF EXISTS Especialidad;
-DROP TABLE IF EXISTS CentroAtencion;
+DROP TABLE IF EXISTS paciente;
+DROP TABLE IF EXISTS medico;
+DROP TABLE IF EXISTS especialidad;
+DROP TABLE IF EXISTS centro_atencion;

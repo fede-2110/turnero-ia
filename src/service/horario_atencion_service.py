@@ -12,23 +12,37 @@ class HorarioAtencionService:
     def agregar_horario_atencion(self, nuevo_horario_atencion):
         with self.uow.start():
             self.repo.add(nuevo_horario_atencion)
+            return nuevo_horario_atencion
 
+    def obtener_horarios_por_medico(self, medico_id, page, per_page):
+        query = self.repo.query().filter(
+            HorarioAtencion.medico_id == medico_id,
+            HorarioAtencion.fecha_baja == None
+        )
+        return paginate(query, page, per_page)
+    
     def obtener_horario_atencion_por_id(self, horario_atencion_id):
         return self.repo.get_by_id(horario_atencion_id)
-
-    def obtener_horarios_atencion(self):
-        return self.repo.get_all()
-
+    
     def obtener_horarios_paginados(self, page, per_page, endpoint):
         return paginate(HorarioAtencion.query, page, per_page, endpoint)
     
-    def actualizar_horario_atencion(self, horario_atencion_actualizado):
-        with self.uow.start():
-            self.repo.update(horario_atencion_actualizado)
-
+    def actualizar_horario_atencion(self, horario_id, datos_horario):
+        horario_existente = self.repo.get_by_id(horario_id)
+        if horario_existente and horario_existente.fecha_baja is None:
+            with self.uow.start():
+                horario_existente.dia_semana = datos_horario.get('dia_semana', horario_existente.dia_semana)
+                horario_existente.hora_inicio = datos_horario.get('hora_inicio', horario_existente.hora_inicio)
+                horario_existente.hora_fin = datos_horario.get('hora_fin', horario_existente.hora_fin)
+                self.repo.update(horario_existente)
+                return horario_existente
+        return None
+    
     # Asume que HorarioAtencion también implementa soft delete con FechaBaja
     def eliminar_horario_atencion(self, horario_atencion_id):
         horario_a_eliminar = self.obtener_horario_atencion_por_id(horario_atencion_id)
         if horario_a_eliminar:
             with self.uow.start():
                 self.repo.delete(horario_a_eliminar)
+                return True
+        return False 

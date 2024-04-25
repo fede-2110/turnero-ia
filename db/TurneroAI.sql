@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS turneroAI;
 USE turneroAI;
 
 -- Tabla de Paciente
-CREATE TABLE IF NOT EXISTS Paciente (
+CREATE TABLE IF NOT EXISTS paciente (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     apellido VARCHAR(255) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Paciente (
 );
 
 -- Tabla de Médico
-CREATE TABLE IF NOT EXISTS Medico (
+CREATE TABLE IF NOT EXISTS medico (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     apellido VARCHAR(255) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS Medico (
 );
 
 -- Tabla de Especialidad Médica
-CREATE TABLE IF NOT EXISTS Especialidad (
+CREATE TABLE IF NOT EXISTS especialidad (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_especialidad VARCHAR(255) NOT NULL,
     descripcion TEXT,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS Especialidad (
 );
 
 -- Tabla de Centro de Atención
-CREATE TABLE IF NOT EXISTS CentroAtencion (
+CREATE TABLE IF NOT EXISTS centro_atencion (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_centro VARCHAR(255) NOT NULL,
     direccion VARCHAR(255) NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS CentroAtencion (
 );
 
 -- Tabla de Consultorio
-CREATE TABLE IF NOT EXISTS Consultorio (
+CREATE TABLE IF NOT EXISTS consultorio (
     id INT AUTO_INCREMENT PRIMARY KEY,
     centro_id INT,
     numero_consultorio VARCHAR(50),
@@ -61,14 +61,14 @@ CREATE TABLE IF NOT EXISTS Cita (
     estado VARCHAR(50),
     motivo_consulta TEXT,
     fecha_baja DATETIME NULL,
-    FOREIGN KEY (paciente_id) REFERENCES Paciente(id) ON DELETE CASCADE,
-    FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE,
-    FOREIGN KEY (centro_id) REFERENCES CentroAtencion(id),
-    FOREIGN KEY (consultorio_id) REFERENCES Consultorio(id) ON DELETE SET NULL
+    FOREIGN KEY (paciente_id) REFERENCES paciente(id) ON DELETE CASCADE,
+    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
+    FOREIGN KEY (centro_id) REFERENCES centro_atencion(id),
+    FOREIGN KEY (consultorio_id) REFERENCES consultorio(id) ON DELETE SET NULL
 );
 
 -- Tabla MédicoEspecialidades (Relación Muchos a Muchos)
-CREATE TABLE IF NOT EXISTS MedicoEspecialidad (
+CREATE TABLE IF NOT EXISTS medico_especialidad (
     medico_id INT,
     especialidad_id INT,
     PRIMARY KEY (medico_id, especialidad_id),
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS MedicoEspecialidad (
 );
 
 -- Tabla MédicoCentros (Relación Muchos a Muchos)
-CREATE TABLE IF NOT EXISTS MedicoCentro (
+CREATE TABLE IF NOT EXISTS medico_centro (
     medico_id INT,
     centro_id INT,
     PRIMARY KEY (medico_id, centro_id),
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS MedicoCentro (
 );
 
 -- Tabla Horario Atención
-CREATE TABLE IF NOT EXISTS HorarioAtencion (
+CREATE TABLE IF NOT EXISTS horario_atencion (
     id INT AUTO_INCREMENT PRIMARY KEY,
     medico_id INT,
     centro_id INT,

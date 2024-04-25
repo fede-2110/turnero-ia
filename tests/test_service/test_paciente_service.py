@@ -4,7 +4,7 @@ from datetime import datetime
 from src.service.paciente_service import PacienteService
 from src.model.models import Paciente
 from src.exceptions.validation_errors import ErrorDniDuplicado, ErrorPacienteNoActivo
-from src.schemas.paciente_schema import PacienteSchema
+
 def test_agregar_paciente_correctamente(session):
     """Verificar que se puede agregar un paciente correctamente."""
     service = PacienteService()
