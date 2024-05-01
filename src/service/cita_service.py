@@ -3,13 +3,17 @@ from src.repository.mysql_repository import MysqlRepository
 from src.service.unit_of_work import UnitOfWork
 from src.model.models import Cita
 from src.utils.pagination import paginate
-import datetime
+from datetime import timedelta, datetime
+from src.service.practica_service import PracticaService
+from src.service.horario_atencion_service import HorarioAtencionService
 
 class CitaService:
     def __init__(self):
         self.repo = MysqlRepository(Cita)
         self.uow = UnitOfWork()
-
+        self.practica_service = PracticaService()
+        self.horario_atencion_service = HorarioAtencionService()
+        
     def programar_cita(self, datos_cita):
         nueva_cita = Cita(
             paciente_id=datos_cita['paciente_id'],
@@ -61,3 +65,39 @@ class CitaService:
                     self.repo.update(cita_a_cancelar)
                     return True
             return False
+        
+    def obtener_disponibilidad(self, medico_id, centro_id, practica_id, fecha_str):
+        # Convertir la fecha de string a objeto datetime.date
+        fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        print(fecha)
+        # Obtener duración de la práctica
+        duracion = self.practica_service.obtener_duracion_por_id(practica_id)
+        
+        # Obtener horarios de atención
+        horarios = self.horario_atencion_service.obtener_horarios_por_medico_y_centro(medico_id, centro_id)
+        print(horarios)
+        # Filtrar horarios por día específico
+        horarios_del_dia = [h for h in horarios if h['dia_semana'] == fecha.weekday()]
+        
+        # Calcular bloques de tiempo disponibles
+        disponibles = []
+        for horario in horarios_del_dia:
+            inicio = datetime.combine(fecha, datetime.strptime(horario['hora_inicio'], '%H:%M:%S').time())
+            fin = datetime.combine(fecha, datetime.strptime(horario['hora_fin'], '%H:%M:%S').time())
+            while inicio + timedelta(minutes=duracion) <= fin:
+                if self.es_tiempo_disponible(medico_id, centro_id, inicio, duracion):
+                    disponibles.append(inicio)
+                inicio += timedelta(minutes=duracion.total_minutes())
+            
+        return disponibles
+    
+    def es_tiempo_disponible(self, medico_id, centro_id, inicio, duracion):
+        fin = inicio + duracion
+        citas_existentes = Cita.query.filter(
+            Cita.medico_id == medico_id,
+            Cita.centro_id == centro_id,
+            Cita.fecha_hora >= inicio,
+            Cita.fecha_hora < fin,
+            Cita.fecha_baja == None
+        ).all()
+        return len(citas_existentes) == 0

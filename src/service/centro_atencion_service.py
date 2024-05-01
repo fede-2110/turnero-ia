@@ -3,6 +3,9 @@ from src.repository.mysql_repository import MysqlRepository
 from src.service.unit_of_work import UnitOfWork
 from src.model.models import CentroAtencion
 from src.utils.pagination import paginate
+from src.model.models import MedicoCentro
+from src.schemas.centro_atencion_schema import CentroAtencionSchema
+from src.model.db import db
 
 class CentroAtencionService:
     def __init__(self):
@@ -26,6 +29,16 @@ class CentroAtencionService:
     def obtener_centros_paginados(self, page, per_page, endpoint):
         return paginate(CentroAtencion.query.filter(CentroAtencion.fecha_baja == None), page, per_page, endpoint)
 
+    def obtener_centros_por_medico(self, medico_id):
+    # Consulta para obtener centros en los que un médico específico trabaja
+        consulta = db.session.query(CentroAtencion).join(MedicoCentro).filter(
+        MedicoCentro.medico_id == medico_id,
+        CentroAtencion.fecha_baja == None,
+        )
+        centros = consulta.all()
+        centro_schema = CentroAtencionSchema(many=True)
+        return centro_schema.dump(centros)
+        
     def actualizar_centro(self, centro_id, centro_actualizado):
         centro_existente = self.obtener_centro_por_id(centro_id)
         if centro_existente:

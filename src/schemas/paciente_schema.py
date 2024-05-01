@@ -22,7 +22,7 @@ class PacienteSchema(SQLAlchemyAutoSchema):
 
     @validates('dni')
     def validate_dni(self, value):
-            if len(value) > 8:
+            if len(value) > 6:
                 raise ValidationError("El DNI debe tener al menos 6 dígitos.")
     
     @validates('fecha_nacimiento')

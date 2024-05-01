@@ -4,6 +4,7 @@ from src.service.unit_of_work import UnitOfWork
 from src.model.models import Medico
 from src.utils.pagination import paginate
 from src.model.db import db
+from src.model.models import MedicoEspecialidad
 
 class MedicoService:
     def __init__(self):
@@ -21,6 +22,15 @@ class MedicoService:
     def obtener_medicos(self):
         return self.repo.get_all()
 
+    def obtener_medicos_por_especialidad(self, especialidad_id):
+        # Realiza la consulta para obtener médicos que están en una especialidad específica
+        medicos = db.session.query(Medico).join(MedicoEspecialidad, Medico.id == MedicoEspecialidad.medico_id).filter(
+            MedicoEspecialidad.especialidad_id == especialidad_id,
+            Medico.fecha_baja == None
+        ).all()
+        # Utiliza el esquema para serializar la lista de objetos de médicos
+        return medicos
+    
     def obtener_medicos_paginados(self, page, per_page, schema, endpoint):
         return paginate(Medico.query, page=page, per_page=per_page, schema=schema, endpoint=endpoint)
     

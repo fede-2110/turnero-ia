@@ -2,6 +2,7 @@
 from src.repository.mysql_repository import MysqlRepository
 from src.service.unit_of_work import UnitOfWork
 from src.model.models import HorarioAtencion
+from src.schemas.horario_atencion_schema import HorarioAtencionSchema
 from src.utils.pagination import paginate
 
 class HorarioAtencionService:
@@ -14,12 +15,15 @@ class HorarioAtencionService:
             self.repo.add(nuevo_horario_atencion)
             return nuevo_horario_atencion
 
-    def obtener_horarios_por_medico(self, medico_id, page, per_page):
-        query = self.repo.query().filter(
+    def obtener_horarios_por_medico_y_centro(self, medico_id, centro_id):
+        horarios = HorarioAtencion.query.filter(
             HorarioAtencion.medico_id == medico_id,
+            HorarioAtencion.centro_id == centro_id,
             HorarioAtencion.fecha_baja == None
-        )
-        return paginate(query, page, per_page)
+        ).all()
+        horario_schema = HorarioAtencionSchema(many=True)
+        return horario_schema.dump(horarios)
+
     
     def obtener_horario_atencion_por_id(self, horario_atencion_id):
         return self.repo.get_by_id(horario_atencion_id)

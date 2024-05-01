@@ -6,42 +6,52 @@ INSERT INTO paciente (nombre, apellido, dni, fecha_nacimiento, telefono, email) 
 
 -- Insertar Médicos
 INSERT INTO medico (nombre, apellido, telefono, email) VALUES
-('Laura', 'Martínez', '333-444-5555', 'laura.martinez@email.com'),
-('Carlos', 'Rodríguez', '444-555-6666', 'carlos.rodriguez@email.com');
+('Giselle', 'Pignatelli', '1144772354', 'pignatelligiselle@gmail.com');
 
 -- Insertar Especialidades Médicas
 INSERT INTO especialidad (nombre_especialidad, descripcion) VALUES
-('Cardiología', 'Especialidad médica dedicada al diagnóstico y tratamiento de enfermedades del corazón y del sistema circulatorio.'),
-('Pediatría', 'Rama de la medicina que involucra el cuidado médico de bebés, niños, y adolescentes.');
+('Dermatología', 'Especialidad médica dedicada al estudio de la piel y sus enfermedades.');
 
 -- Insertar Centros de Atención
-INSERT INTO centro_atencion (nombre_centro, direccion, telefono) VALUES
-('Centro Médico Amanecer', 'Calle Falsa 123, Ciudad Esperanza', '555-666-7777'),
-('Clínica Salud y Vida', 'Avenida Siempre Viva 456, Ciudad Sol', '666-777-8888');
-
--- Insertar Consultorios (opcional)
-INSERT INTO consultorio (centro_id, numero_consultorio) VALUES
-(1, '101'),
-(2, '201');
-
--- Insertar Citas
-INSERT INTO cita (paciente_id, medico_id, centro_id, fecha_hora, estado, motivo_consulta) VALUES
-(1, 1, 1, '2024-04-15 09:00:00', 'Confirmada', 'Consulta de rutina'),
-(2, 2, 2, '2024-04-16 10:30:00', 'Pendiente', 'Revisión pediátrica');
+INSERT INTO centro_atencion (nombre_centro, direccion, telefono, es_por_orden_de_llegada) VALUES 
+('Advanced Skin Center', 'Mitre 114, Lomas de Zamora', '1158478642',0),
+('Consultorios Medicos Comunitarios', 'Av. Eva Peron 4265, Monte Chingolo', '1123743406',1),
+('Consultorios Integrados San Francisco Solano', 'Av. 844 2762, Solano', '1139020542',1),
+('Centro Medico Especializado Lamadrid', 'Mosconi 5, Quilmes', '1158014525',0),
+('Consultorios Medicos Bayer', '9 de Julio 1597, Temperley', '1166468195',0),
+('Consultorios Medicos El Zorzal', 'El Zorzal 3075, Temperley', '1134383321',1),
+('Consultorio Villa Industriales', 'Gobernador Manuel Ocampo 1459, Lanus', '1140982530',1);
 
 -- Relación Médicos-Especialidades
 INSERT INTO medico_especialidad (medico_id, especialidad_id) VALUES
-(1, 1),
-(2, 2);
+(1, 1); -- Asumiendo que Dermatología es el ID 1 en especialidad
 
 -- Relación Médicos-Centros
 INSERT INTO medico_centro (medico_id, centro_id) VALUES
 (1, 1),
-(2, 2);
+(1, 2),
+(1, 3),
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 7);
 
 -- Insertar Horarios de Atención
 INSERT INTO horario_atencion (medico_id, centro_id, dia_semana, hora_inicio, hora_fin) VALUES
-(1, 1, 'Lunes', '08:00:00', '12:00:00'),
-(1, 1, 'Miércoles', '14:00:00', '18:00:00'),
-(2, 2, 'Martes', '09:00:00', '13:00:00'),
-(2, 2, 'Jueves', '15:00:00', '19:00:00');
+(1, 1, 4, '11:00', '19:00'),
+(1, 2, 0, '13:00', '14:30'),
+(1, 3, 0, '15:00', '18:00'),
+(1, 4, 1, '09:00', '12:00'),
+(1, 5, 2, '09:00', '16:00'),
+(1, 6, 3, '13:30', '15:00'),
+(1, 7, 5, '09:00', '12:00');
+
+-- Insertar prácticas
+INSERT INTO practicas (especialidad_id, nombre, descripcion, duracion_min) VALUES
+(1, 'Consulta general', 'Revisión general de dermatología.', 15),
+(1, 'Biopsia', 'Biopsia cutanea.', 30);
+
+-- Insertar Citas de ejemplo
+INSERT INTO cita (paciente_id, medico_id, centro_id, fecha_hora, estado, practica_id) VALUES
+(1, 1, 1, '2024-04-15 09:00:00', 'Confirmada', 1),
+(2, 1, 1, '2024-04-16 10:30:00', 'Pendiente', 2);

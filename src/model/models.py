@@ -30,7 +30,16 @@ class Especialidad(db.Model):
     nombre_especialidad = db.Column(db.String(255), nullable=False)
     descripcion = db.Column(db.Text)
     fecha_baja = db.Column(db.DateTime)
-
+    
+class Practica(db.Model):
+    __tablename__ = 'practica'
+    id = db.Column(db.Integer, primary_key=True)
+    especialidad_id = db.Column(db.Integer, db.ForeignKey('especialidad.id'), nullable=False)
+    nombre = db.Column(db.String(255), nullable=False)
+    descripcion = db.Column(db.Text)
+    duracion_min = db.Column(db.Integer, nullable=False)
+    fecha_baja = db.Column(db.DateTime)
+    
 class CentroAtencion(db.Model):
     __tablename__ = 'centro_atencion'
     
@@ -38,6 +47,7 @@ class CentroAtencion(db.Model):
     nombre_centro = db.Column(db.String(255), nullable=False)
     direccion = db.Column(db.String(255), nullable=False)
     telefono = db.Column(db.String(20))
+    es_por_orden_de_llegada = db.Column(db.Boolean, default=False, nullable=False)
     fecha_baja = db.Column(db.DateTime)
 
 class Consultorio(db.Model):
@@ -58,7 +68,7 @@ class Cita(db.Model):
     consultorio_id = db.Column(db.Integer, db.ForeignKey('consultorio.id'), nullable=True)
     fecha_hora = db.Column(db.DateTime, nullable=False)
     estado = db.Column(db.String(50))
-    motivo_consulta = db.Column(db.Text)
+    practica_id = db.Column(db.Integer, db.ForeignKey('practica.id'), nullable=False)
     fecha_baja = db.Column(db.DateTime)
 
 class MedicoEspecialidad(db.Model):
@@ -79,7 +89,8 @@ class HorarioAtencion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     medico_id = db.Column(db.Integer, db.ForeignKey('medico.id'), nullable=False)
     centro_id = db.Column(db.Integer, db.ForeignKey('centro_atencion.id'), nullable=False)
-    dia_semana = db.Column(db.String(10), nullable=False)
+    dia_semana = db.Column(db.Integer, nullable=False)
     hora_inicio = db.Column(db.Time, nullable=False)
     hora_fin = db.Column(db.Time, nullable=False)
     fecha_baja = db.Column(db.DateTime)
+

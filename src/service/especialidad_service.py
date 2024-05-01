@@ -2,6 +2,7 @@
 from src.repository.mysql_repository import MysqlRepository
 from src.service.unit_of_work import UnitOfWork
 from src.model.models import Especialidad
+from src.model.db import db
 from src.utils.pagination import paginate
 
 class EspecialidadService:
@@ -20,13 +21,15 @@ class EspecialidadService:
             return especialidad
         return None
 
+    def obtener_especialidad_por_descripcion(self, description):
+        return db.session.query(Especialidad).filter(Especialidad.nombre_especialidad.ilike(f"%{description}%")).first()
+
     def obtener_especialidades(self):
         return self.repo.get_all()
     
     def obtener_especialidades_paginadas(self, page, per_page, endpoint):
         return paginate(Especialidad.query.filter(Especialidad.fecha_baja == None), page, per_page, endpoint)
     
-
     def actualizar_especialidad(self, especialidad_actualizada):
         with self.uow.start():
             self.repo.update(especialidad_actualizada)

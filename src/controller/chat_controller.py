@@ -46,4 +46,4 @@ class ChatUpdate(Resource):
             result = chat_service.process_message(thread_id, user_input)
             return ApiResponse.success(data={'message': result})
         except Exception as e:
-            return ApiResponse.server_error(message=str(e))
+            return ApiResponse.server_error("Lo sentimos, estamos teniendo dificultades tecnicas. Te solicitamos que intentes por otro canal de comunicacion. Muchas gracias")
