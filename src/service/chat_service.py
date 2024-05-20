@@ -1,15 +1,11 @@
 # src/service/chat_service.py
-from openai import OpenAI
-import json
 from datetime import datetime
-import time
-import os
 from src.service.paciente_service import PacienteService
 from src.service.centro_atencion_service import CentroAtencionService
 from src.service.cita_service import CitaService
 from src.schemas.paciente_schema import PacienteSchema
 from src.schemas.practica_schema import PracticaSchema
-from src.schemas.especialidad_schema import EspecialidadSchema
+from src.schemas.cita_schema import CitaSchema
 from src.schemas.medico_schema import MedicoSchema
 from src.service.horario_atencion_service import HorarioAtencionService
 from src.service.practica_service import PracticaService
@@ -18,68 +14,17 @@ from src.service.medico_service import MedicoService
 
 class ChatService:
     def __init__(self):
-        self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        self.assistant_id = os.environ.get("ASSISTANT_ID")
         self.paciente_service = PacienteService()
         self.paciente_schema = PacienteSchema()
         self.practica_schema = PracticaSchema()
         self.medico_schema = MedicoSchema()
+        self.cita_schema = CitaSchema()
         self.centro_atencion_service = CentroAtencionService()
         self.horario_atencion_service = HorarioAtencionService()
         self.cita_service = CitaService()
         self.practica_service = PracticaService()
         self.especialidad_service = EspecialidadService()
         self.medico_service = MedicoService()
-        
-    def create_thread(self):
-        return self.client.beta.threads.create()
-
-    def add_message(self, thread_id, message):
-        return self.client.beta.threads.messages.create(
-            thread_id=thread_id,
-            role="user",
-            content=message
-        )
-
-    def process_message(self, thread_id, user_input):
-        self.add_message(thread_id, user_input)
-        run = self.client.beta.threads.runs.create(
-            thread_id=thread_id,
-            assistant_id=self.assistant_id
-        )
-        return self.handle_run(thread_id, run.id)
-
-    def handle_run(self, thread_id, run_id):
-        while True:
-            run = self.client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
-            if run.status == "requires_action":
-                self.handle_required_actions(run, thread_id, run_id)
-            elif run.status in ["completed", "failed", "cancelled"]:
-                break
-            time.sleep(1)
-        return self.get_latest_message(thread_id)
-
-    def handle_required_actions(self, run, thread_id, run_id):
-        tool_calls = run.required_action.submit_tool_outputs.tool_calls
-        tool_outputs = []
-        
-        for tool_call in tool_calls:
-            function_name = tool_call.function.name
-            print("Processing function:", function_name)
-            arguments = json.loads(tool_call.function.arguments)
-            output = self.execute_function(function_name, arguments)
-            
-            tool_outputs.append({
-                "tool_call_id": tool_call.id,
-                "output": json.dumps(output)
-            })
-            
-        if tool_outputs:
-            self.client.beta.threads.runs.submit_tool_outputs(
-                thread_id=thread_id,
-                run_id=run_id,
-                tool_outputs=tool_outputs
-            )
 
     def execute_function(self, function_name, arguments):
         if function_name == "fetch_patient_info":
@@ -100,8 +45,10 @@ class ChatService:
             return self.fetch_doctors_by_specialty(arguments)
         elif function_name == "fetch_current_day":
             return self.fetch_current_day()
+        elif function_name == "create_appointment":
+            return self.create_appointment(arguments)
         return "Function not handled"
-
+ 
     def fetch_patient_info(self, arguments):
         dni = arguments['patient_dni']
         paciente = self.paciente_service.obtener_paciente_por_dni(dni)
@@ -111,6 +58,7 @@ class ChatService:
         else:
             return "Paciente no encontrado"
     def create_patient(self, arguments):
+        print(arguments)
         paciente = self.paciente_schema.load(arguments)
         nuevo_paciente = self.paciente_service.agregar_paciente(paciente)
         return self.paciente_schema.dump(nuevo_paciente)
@@ -133,6 +81,7 @@ class ChatService:
         print("id del medico: " + arguments['medico_id'])
         medico_id = 1
         centro_id = arguments['centro_id']
+        print("El id del centro: " + centro_id)
         available_days = self.horario_atencion_service.obtener_horarios_por_medico_y_centro(medico_id, centro_id)
         if available_days:
             return available_days
@@ -185,8 +134,18 @@ class ChatService:
             return self.practica_schema.dump(practices, many=True)
         else:
             return "Práctica no encontrada"
+    def create_appointment(self, arguments):
+        cita = self.cita_schema.load(arguments)
+        nueva_cita = self.cita_service.agregar_cita(cita)
+        return self.cita_schema.dump(nueva_cita)
     @staticmethod
     def fetch_current_day():
-        current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_datetime = datetime.now()
+        current_date = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+        day_of_week = (current_datetime.weekday() + 1) % 7
         print("El día del sistema: " + current_date)
-        return current_date
+        print("Día de la semana: " + str(day_of_week))
+        return {
+            "current_date": current_date,
+            "day_of_week": day_of_week
+        }

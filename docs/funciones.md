@@ -183,7 +183,47 @@
 }
 
 {
+  "name": "create_appointment",
+  "description": "Creates a new appointment in the system and returns the appointment ID.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "paciente_id": {
+        "type": "string",
+        "description": "The unique identifier of the patient."
+      },
+      "medico_id": {
+        "type": "string",
+        "description": "The unique identifier of the doctor."
+      },
+      "centro_id": {
+        "type": "string",
+        "description": "The unique identifier of the medical center."
+      },
+      "practica_id": {
+        "type": "string",
+        "description": "The unique identifier of the medical practice associated with the appointment."
+      },
+      "fecha_hora": {
+        "type": "string",
+        "description": "The date and time of the appointment in ISO 8601 format."
+      }
+    },
+    "required": [
+      "paciente_id",
+      "medico_id",
+      "centro_id",
+      "practica_id",
+      "fecha_hora"
+    ]
+  }
+}
+{
   "name": "fetch_current_day",
-  "description": "Retrieves the current day of the week from the system.",
-  "parameters": {}
+  "description": "Retrieves the current day as a formatted string and the weekday as an integer where 0 is Sunday and 6 is Saturday.",
+  "parameters": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  }
 }

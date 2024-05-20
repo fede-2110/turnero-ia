@@ -6,6 +6,7 @@ from src.utils.pagination import paginate
 from datetime import timedelta, datetime
 from src.service.practica_service import PracticaService
 from src.service.horario_atencion_service import HorarioAtencionService
+import json 
 
 class CitaService:
     def __init__(self):
@@ -13,17 +14,8 @@ class CitaService:
         self.uow = UnitOfWork()
         self.practica_service = PracticaService()
         self.horario_atencion_service = HorarioAtencionService()
-        
-    def programar_cita(self, datos_cita):
-        nueva_cita = Cita(
-            paciente_id=datos_cita['paciente_id'],
-            medico_id=datos_cita['medico_id'],
-            centro_id=datos_cita['centro_id'],
-            consultorio_id=datos_cita.get('consultorio_id'),
-            fecha_hora=datos_cita['fecha_hora'],
-            estado='Programada',
-            motivo_consulta=datos_cita.get('motivo_consulta')
-        )
+    
+    def agregar_cita(self, nueva_cita):
         with self.uow.start():
             self.repo.add(nueva_cita)
             return nueva_cita
@@ -70,29 +62,35 @@ class CitaService:
         # Convertir la fecha de string a objeto datetime.date
         fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
         print(fecha)
-        # Obtener duración de la práctica
+        # Obtener el día de la semana
+        dia_semana = fecha.weekday()  # Esto retorna 0 para lunes, 6 para domingo
+        print(f"Fecha: {fecha}, Día de la semana: {dia_semana}")
+        
+            # Obtener duración de la práctica
         duracion = self.practica_service.obtener_duracion_por_id(practica_id)
         
         # Obtener horarios de atención
         horarios = self.horario_atencion_service.obtener_horarios_por_medico_y_centro(medico_id, centro_id)
-        print(horarios)
         # Filtrar horarios por día específico
-        horarios_del_dia = [h for h in horarios if h['dia_semana'] == fecha.weekday()]
-        
+        horarios_del_dia = [h for h in horarios if h['dia_semana'] == dia_semana]
+
         # Calcular bloques de tiempo disponibles
         disponibles = []
+
         for horario in horarios_del_dia:
             inicio = datetime.combine(fecha, datetime.strptime(horario['hora_inicio'], '%H:%M:%S').time())
             fin = datetime.combine(fecha, datetime.strptime(horario['hora_fin'], '%H:%M:%S').time())
             while inicio + timedelta(minutes=duracion) <= fin:
                 if self.es_tiempo_disponible(medico_id, centro_id, inicio, duracion):
-                    disponibles.append(inicio)
-                inicio += timedelta(minutes=duracion.total_minutes())
-            
-        return disponibles
+                    disponibles.append(inicio.isoformat())
+                inicio += timedelta(minutes=duracion)
+
+        # Convertir la lista de fechas disponibles a formato JSON antes de devolverla
+        return json.dumps(disponibles)
     
     def es_tiempo_disponible(self, medico_id, centro_id, inicio, duracion):
-        fin = inicio + duracion
+        print("Es tiempo disponible...")
+        fin = inicio + timedelta(minutes=duracion)
         citas_existentes = Cita.query.filter(
             Cita.medico_id == medico_id,
             Cita.centro_id == centro_id,
@@ -100,4 +98,5 @@ class CitaService:
             Cita.fecha_hora < fin,
             Cita.fecha_baja == None
         ).all()
+
         return len(citas_existentes) == 0

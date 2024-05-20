@@ -6,6 +6,7 @@ from src.schemas.chat_schema import ChatSchema
 from src.service.paciente_service import PacienteService
 from src.schemas.paciente_schema import PacienteSchema
 from src.service.chat_service import ChatService
+from src.service.thread_service import ThreadService
 
 chat_ns = Namespace('chat', description='Operaciones relacionadas con el chat')
 chat_schema = ChatSchema()
@@ -15,6 +16,7 @@ chat_model = chat_ns.model('Chat', {
 paciente_service = PacienteService()
 chat_service = ChatService()
 paciente_schema = PacienteSchema()
+thread_service = ThreadService()
 
 @chat_ns.route('/create')
 class ChatCreate(Resource):
@@ -22,7 +24,7 @@ class ChatCreate(Resource):
     def post(self):
         """Inicia una nueva conversación con el asistente de IA"""
         try:
-            thread = chat_service.create_thread()
+            thread = thread_service.create_thread()
             if thread:
                 return ApiResponse.success(data={'thread_id': thread.id}, message="Thread creado con éxito.")
             else:
@@ -43,7 +45,8 @@ class ChatUpdate(Resource):
             return ApiResponse.client_error(message=str(errors), status=400)
         user_input = data['message']
         try:
-            result = chat_service.process_message(thread_id, user_input)
+            result = thread_service.process_message(thread_id, user_input)
             return ApiResponse.success(data={'message': result})
         except Exception as e:
-            return ApiResponse.server_error("Lo sentimos, estamos teniendo dificultades tecnicas. Te solicitamos que intentes por otro canal de comunicacion. Muchas gracias")
+            return ApiResponse.server_error(e)
+            # return ApiResponse.server_error("Lo sentimos, estamos teniendo dificultades tecnicas. Te solicitamos que intentes por otro canal de comunicacion. Muchas gracias")
