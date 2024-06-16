@@ -47,7 +47,7 @@ INSERT INTO horario_atencion (medico_id, centro_id, dia_semana, hora_inicio, hor
 (1, 7, 5, '09:00', '12:00');
 
 -- Insertar prácticas
-INSERT INTO practicas (especialidad_id, nombre, descripcion, duracion_min) VALUES
+INSERT INTO practica (especialidad_id, nombre, descripcion, duracion_min) VALUES
 (1, 'Consulta general', 'Revisión general de dermatología.', 15),
 (1, 'Biopsia', 'Biopsia cutanea.', 30);
 
@@ -55,3 +55,17 @@ INSERT INTO practicas (especialidad_id, nombre, descripcion, duracion_min) VALUE
 INSERT INTO cita (paciente_id, medico_id, centro_id, fecha_hora, estado, practica_id) VALUES
 (1, 1, 1, '2024-04-15 09:00:00', 'Confirmada', 1),
 (2, 1, 1, '2024-04-16 10:30:00', 'Pendiente', 2);
+
+-- Insertar Roles
+INSERT INTO rol (nombre, descripcion) VALUES
+('Admin', 'Administrador del sistema'),
+('Medico', 'Rol para médicos'),
+('Paciente', 'Rol para pacientes');
+
+-- Insertar Usuarios
+INSERT INTO usuario (nombre, email, password_hash) VALUES
+('admin', 'admin@example.com', '$2b$12$D4G5f18o/MmFpO0hFAF4eO/qiFzr.CV2PMn7ylWuoIjS/ICFob.hG'); -- Password: admin123 (hashed)
+
+-- Relación Usuarios-Roles
+INSERT INTO usuario_rol (usuario_id, rol_id) VALUES
+(1, 1); -- Asumiendo que el usuario 'admin' es el ID 1 y el rol 'Admin' es el ID 1

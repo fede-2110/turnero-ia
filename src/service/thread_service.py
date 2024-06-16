@@ -9,9 +9,18 @@ class ThreadService:
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         self.assistant_id = os.environ.get("ASSISTANT_ID")
         self.chat_service = ChatService()
-    
+        self.current_day_info = None
+
     def create_thread(self):
-        return self.client.beta.threads.create()
+        thread = self.client.beta.threads.create()
+        if self.current_day_info is None:
+            self.current_day_info = self.chat_service.fetch_current_day()
+        
+        metadata = {
+            'current_day_info': json.dumps(self.current_day_info)
+        }
+        self.client.beta.threads.update(thread_id=thread.id, metadata=metadata)
+        return thread
 
     def add_message(self, thread_id, message):
         return self.client.beta.threads.messages.create(

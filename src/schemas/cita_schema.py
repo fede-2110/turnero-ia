@@ -15,5 +15,4 @@ class CitaSchema(SQLAlchemyAutoSchema):
     centro_id = auto_field(required=True)
     consultorio_id = auto_field()  # Opcional
     fecha_hora = auto_field(required=True)
-    estado = auto_field(required=True)
     practica_id = auto_field(required=True)

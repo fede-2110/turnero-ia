@@ -1,5 +1,7 @@
 # src/model/models.py
 from .db import db
+from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Paciente(db.Model):
     __tablename__ = 'paciente'
@@ -93,4 +95,40 @@ class HorarioAtencion(db.Model):
     hora_inicio = db.Column(db.Time, nullable=False)
     hora_fin = db.Column(db.Time, nullable=False)
     fecha_baja = db.Column(db.DateTime)
+
+class Usuario(db.Model):
+    __tablename__ = 'usuario'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    provider = db.Column(db.String(50))
+    provider_id = db.Column(db.String(255))
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    fecha_baja = db.Column(db.DateTime)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+class Rol(db.Model):
+    __tablename__ = 'rol'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50), unique=True, nullable=False)
+    descripcion = db.Column(db.Text)
+
+class UsuarioRol(db.Model):
+    __tablename__ = 'usuario_rol'
+    
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), primary_key=True)
+    rol_id = db.Column(db.Integer, db.ForeignKey('rol.id'), primary_key=True)
+    usuario = db.relationship('Usuario', back_populates='roles')
+    rol = db.relationship('Rol', back_populates='usuarios')
+
+Usuario.roles = db.relationship('UsuarioRol', back_populates='usuario')
+Rol.usuarios = db.relationship('UsuarioRol', back_populates='rol')
 

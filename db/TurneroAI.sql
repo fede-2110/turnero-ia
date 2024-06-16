@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS centro_atencion (
     nombre_centro VARCHAR(255) NOT NULL,
     direccion VARCHAR(255) NOT NULL,
     telefono VARCHAR(20),
+    es_por_orden_de_llegada BOOLEAN DEFAULT FALSE NOT NULL,
     fecha_baja DATETIME NULL
 );
 
@@ -47,11 +48,11 @@ CREATE TABLE IF NOT EXISTS consultorio (
     centro_id INT,
     numero_consultorio VARCHAR(50),
     fecha_baja DATETIME NULL,
-    FOREIGN KEY (centro_id) REFERENCES CentroAtencion(id) ON DELETE CASCADE
+    FOREIGN KEY (centro_id) REFERENCES centro_atencion(id) ON DELETE CASCADE
 );
 
 -- Tabla de Cita
-CREATE TABLE IF NOT EXISTS Cita (
+CREATE TABLE IF NOT EXISTS cita (
     id INT AUTO_INCREMENT PRIMARY KEY,
     paciente_id INT,
     medico_id INT,
@@ -59,12 +60,13 @@ CREATE TABLE IF NOT EXISTS Cita (
     consultorio_id INT NULL, -- Opcional inicialmente
     fecha_hora DATETIME NOT NULL,
     estado VARCHAR(50),
-    motivo_consulta TEXT,
+    practica_id INT,
     fecha_baja DATETIME NULL,
     FOREIGN KEY (paciente_id) REFERENCES paciente(id) ON DELETE CASCADE,
     FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
     FOREIGN KEY (centro_id) REFERENCES centro_atencion(id),
-    FOREIGN KEY (consultorio_id) REFERENCES consultorio(id) ON DELETE SET NULL
+    FOREIGN KEY (consultorio_id) REFERENCES consultorio(id) ON DELETE SET NULL,
+    FOREIGN KEY (practica_id) REFERENCES practica(id) ON DELETE CASCADE
 );
 
 -- Tabla MédicoEspecialidades (Relación Muchos a Muchos)
@@ -72,8 +74,8 @@ CREATE TABLE IF NOT EXISTS medico_especialidad (
     medico_id INT,
     especialidad_id INT,
     PRIMARY KEY (medico_id, especialidad_id),
-    FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE,
-    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id) ON DELETE CASCADE
+    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
+    FOREIGN KEY (especialidad_id) REFERENCES especialidad(id) ON DELETE CASCADE
 );
 
 -- Tabla MédicoCentros (Relación Muchos a Muchos)
@@ -81,8 +83,8 @@ CREATE TABLE IF NOT EXISTS medico_centro (
     medico_id INT,
     centro_id INT,
     PRIMARY KEY (medico_id, centro_id),
-    FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE,
-    FOREIGN KEY (centro_id) REFERENCES CentroAtencion(id) ON DELETE CASCADE
+    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
+    FOREIGN KEY (centro_id) REFERENCES centro_atencion(id) ON DELETE CASCADE
 );
 
 -- Tabla Horario Atención
@@ -90,10 +92,49 @@ CREATE TABLE IF NOT EXISTS horario_atencion (
     id INT AUTO_INCREMENT PRIMARY KEY,
     medico_id INT,
     centro_id INT,
-    dia_semana VARCHAR(10),
+    dia_semana INT,
     hora_inicio TIME,
     hora_fin TIME,
     fecha_baja DATETIME NULL,
-    FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE,
-    FOREIGN KEY (centro_id) REFERENCES CentroAtencion(id) ON DELETE CASCADE
+    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
+    FOREIGN KEY (centro_id) REFERENCES centro_atencion(id) ON DELETE CASCADE
+);
+
+-- Tabla de Práctica
+CREATE TABLE IF NOT EXISTS practica (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    especialidad_id INT,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+    duracion_min INT NOT NULL,
+    fecha_baja DATETIME NULL,
+    FOREIGN KEY (especialidad_id) REFERENCES especialidad(id) ON DELETE CASCADE
+);
+
+-- Tabla de Usuario
+CREATE TABLE IF NOT EXISTS usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    provider VARCHAR(50),
+    provider_id VARCHAR(255),
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_baja DATETIME NULL
+);
+
+-- Tabla de Rol
+CREATE TABLE IF NOT EXISTS rol (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL,
+    descripcion TEXT
+);
+
+-- Tabla UsuarioRol (Relación Muchos a Muchos)
+CREATE TABLE IF NOT EXISTS usuario_rol (
+    usuario_id INT,
+    rol_id INT,
+    PRIMARY KEY (usuario_id, rol_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE,
+    FOREIGN KEY (rol_id) REFERENCES rol(id) ON DELETE CASCADE
 );
