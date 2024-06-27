@@ -1,4 +1,3 @@
-# src/controller.py
 from src.controller.paciente_controller import paciente_ns
 from src.controller.chat_controller import chat_ns
 

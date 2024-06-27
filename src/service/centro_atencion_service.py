@@ -6,11 +6,13 @@ from src.utils.pagination import paginate
 from src.model.models import MedicoCentro
 from src.schemas.centro_atencion_schema import CentroAtencionSchema
 from src.model.db import db
+from injector import inject
 
 class CentroAtencionService:
-    def __init__(self):
-        self.repo = MysqlRepository(CentroAtencion)
-        self.uow = UnitOfWork()
+    @inject
+    def __init__(self, repo: MysqlRepository, uow: UnitOfWork):
+        self.repo = repo
+        self.uow = uow
 
     def agregar_centro(self, nuevo_centro):
         with self.uow.start():

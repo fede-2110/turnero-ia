@@ -4,11 +4,13 @@ from src.service.unit_of_work import UnitOfWork
 from src.model.models import Especialidad
 from src.model.db import db
 from src.utils.pagination import paginate
+from injector import inject
 
 class EspecialidadService:
-    def __init__(self):
-        self.repo = MysqlRepository(Especialidad)
-        self.uow = UnitOfWork()
+    @inject
+    def __init__(self, repo: MysqlRepository, uow: UnitOfWork):
+        self.repo = repo
+        self.uow = uow
 
     def agregar_especialidad(self, nueva_especialidad):
         with self.uow.start():

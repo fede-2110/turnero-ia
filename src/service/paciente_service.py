@@ -6,11 +6,13 @@ from src.utils.pagination import paginate
 from src.model.db import db
 from src.utils.validation_utils import validar_datos_paciente
 from src.utils.cleanup_utils import clean_dni
+from injector import inject
 
 class PacienteService:
-    def __init__(self):
-        self.repo = MysqlRepository(Paciente)
-        self.uow = UnitOfWork()
+    @inject
+    def __init__(self, repo: MysqlRepository, uow: UnitOfWork):
+        self.repo = repo
+        self.uow = uow
 
     def agregar_paciente(self, nuevo_paciente):
         validar_datos_paciente(nuevo_paciente)

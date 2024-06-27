@@ -1,5 +1,6 @@
 # src/service/chat_service.py
 from datetime import datetime
+from injector import inject
 from src.service.paciente_service import PacienteService
 from src.service.centro_atencion_service import CentroAtencionService
 from src.service.cita_service import CitaService
@@ -14,18 +15,30 @@ from src.service.medico_service import MedicoService
 import json
 
 class ChatService:
-    def __init__(self):
-        self.paciente_service = PacienteService()
-        self.paciente_schema = PacienteSchema()
-        self.practica_schema = PracticaSchema()
-        self.medico_schema = MedicoSchema()
-        self.cita_schema = CitaSchema()
-        self.centro_atencion_service = CentroAtencionService()
-        self.horario_atencion_service = HorarioAtencionService()
-        self.cita_service = CitaService()
-        self.practica_service = PracticaService()
-        self.especialidad_service = EspecialidadService()
-        self.medico_service = MedicoService()
+    @inject
+    def __init__(self, 
+                 paciente_service: PacienteService,
+                 centro_atencion_service: CentroAtencionService,
+                 cita_service: CitaService,
+                 horario_atencion_service: HorarioAtencionService,
+                 practica_service: PracticaService,
+                 especialidad_service: EspecialidadService,
+                 medico_service: MedicoService,
+                 paciente_schema: PacienteSchema,
+                 practica_schema: PracticaSchema,
+                 medico_schema: MedicoSchema,
+                 cita_schema: CitaSchema):
+        self.paciente_service = paciente_service
+        self.paciente_schema = paciente_schema
+        self.practica_schema = practica_schema
+        self.medico_schema = medico_schema
+        self.cita_schema = cita_schema
+        self.centro_atencion_service = centro_atencion_service
+        self.horario_atencion_service = horario_atencion_service
+        self.cita_service = cita_service
+        self.practica_service = practica_service
+        self.especialidad_service = especialidad_service
+        self.medico_service = medico_service
         self.current_day_info = None
         
     def execute_function(self, function_name, arguments):
@@ -49,7 +62,7 @@ class ChatService:
             else:
                 return function_map[function_name](arguments)
         return "Function not handled"
- 
+
     def fetch_patient_info(self, arguments):
         dni = arguments['patient_dni']
         paciente = self.paciente_service.obtener_paciente_por_dni(dni)

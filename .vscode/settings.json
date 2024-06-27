@@ -6,6 +6,7 @@
     "python.testing.pytestEnabled": true,
     "conventionalCommits.scopes": [
         "initi",
-        "jwt"
+        "jwt",
+        "di"
     ],
 }

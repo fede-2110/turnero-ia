@@ -3,12 +3,13 @@ from src.service.unit_of_work import UnitOfWork
 from src.model.models import Practica
 from src.model.models import Especialidad
 from src.model.db import db
+from injector import inject
 
 class PracticaService:
-    def __init__(self):
-        self.repo = MysqlRepository(Practica)
-        self.uow = UnitOfWork()
-
+    @inject
+    def __init__(self, repo: MysqlRepository, uow: UnitOfWork):
+        self.repo = repo
+        self.uow = uow
     def agregar_practica(self, nueva_practica):
         with self.uow.start():
             self.repo.add(nueva_practica)

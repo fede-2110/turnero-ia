@@ -6,14 +6,16 @@ from src.utils.pagination import paginate
 from datetime import timedelta, datetime
 from src.service.practica_service import PracticaService
 from src.service.horario_atencion_service import HorarioAtencionService
+from injector import inject
 import json 
 
 class CitaService:
-    def __init__(self):
-        self.repo = MysqlRepository(Cita)
-        self.uow = UnitOfWork()
-        self.practica_service = PracticaService()
-        self.horario_atencion_service = HorarioAtencionService()
+    @inject
+    def __init__(self, repo: MysqlRepository, uow: UnitOfWork, practica_service: PracticaService, horario_atencion_service: HorarioAtencionService):
+        self.repo = repo
+        self.uow = uow
+        self.practica_service = practica_service
+        self.horario_atencion_service = horario_atencion_service
     
     def agregar_cita(self, nueva_cita):
         with self.uow.start():

@@ -4,11 +4,13 @@ from src.service.unit_of_work import UnitOfWork
 from src.model.models import HorarioAtencion
 from src.schemas.horario_atencion_schema import HorarioAtencionSchema
 from src.utils.pagination import paginate
+from injector import inject
 
-class HorarioAtencionService:
-    def __init__(self):
-        self.repo = MysqlRepository(HorarioAtencion)
-        self.uow = UnitOfWork()
+class HorarioAtencionService:    
+    @inject
+    def __init__(self, repo: MysqlRepository, uow: UnitOfWork):
+        self.repo = repo
+        self.uow = uow
 
     def agregar_horario_atencion(self, nuevo_horario_atencion):
         with self.uow.start():

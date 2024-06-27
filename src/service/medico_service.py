@@ -5,12 +5,14 @@ from src.model.models import Medico
 from src.utils.pagination import paginate
 from src.model.db import db
 from src.model.models import MedicoEspecialidad
+from injector import inject
 
 class MedicoService:
-    def __init__(self):
-        self.repo = MysqlRepository(Medico)
-        self.uow = UnitOfWork()
-
+    @inject
+    def __init__(self, repo: MysqlRepository, uow: UnitOfWork):
+        self.repo = repo
+        self.uow = uow
+        
     def agregar_medico(self, nuevo_medico):
         with self.uow.start():
             self.repo.add(nuevo_medico)

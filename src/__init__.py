@@ -4,6 +4,10 @@ from src.model.db import db
 from flask_restx import Api
 from src.controllers import register_controllers
 from src.error_handlers import register_error_handlers
+from injector import Injector
+from flask_injector import FlaskInjector
+from src.di.dependency_injector import setup_injector
+
 
 def create_app():
     app = Flask(__name__)
@@ -22,5 +26,9 @@ def create_app():
     
     # Global error handlers
     register_error_handlers(app)
+    
+    # Setup injector
+    injector = setup_injector()
+    FlaskInjector(app=app, injector=injector)
     
     return app

@@ -3,11 +3,12 @@ from src.repository.mysql_repository import MysqlRepository
 from src.service.unit_of_work import UnitOfWork
 from src.model.models import Consultorio
 from src.utils.pagination import paginate
-
+from injector import inject
 class ConsultorioService:
-    def __init__(self):
-        self.repo = MysqlRepository(Consultorio)
-        self.uow = UnitOfWork()
+    @inject
+    def __init__(self, repo: MysqlRepository, uow: UnitOfWork):
+        self.repo = repo
+        self.uow = uow
 
     def agregar_consultorio(self, nuevo_consultorio):
         with self.uow.start():

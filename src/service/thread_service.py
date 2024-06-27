@@ -2,15 +2,17 @@ from openai import OpenAI
 import time
 import json
 import os
+from injector import inject
 from src.service.chat_service import ChatService
 
 class ThreadService:
-    def __init__(self):
+    @inject
+    def __init__(self, chat_service: ChatService):
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         self.assistant_id = os.environ.get("ASSISTANT_ID")
-        self.chat_service = ChatService()
+        self.chat_service = chat_service
         self.current_day_info = None
-
+        
     def create_thread(self):
         thread = self.client.beta.threads.create()
         if self.current_day_info is None:
