@@ -132,3 +132,47 @@ class UsuarioRol(db.Model):
 Usuario.roles = db.relationship('UsuarioRol', back_populates='usuario')
 Rol.usuarios = db.relationship('UsuarioRol', back_populates='rol')
 
+# Tablas para Facturación
+
+class Producto(db.Model):
+    __tablename__ = 'producto'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(255), nullable=False)
+    descripcion = db.Column(db.Text)
+    precio = db.Column(db.Numeric(10, 2), nullable=False)
+    fecha_vigencia_inicio = db.Column(db.Date, nullable=False)
+    fecha_vigencia_fin = db.Column(db.Date)
+
+class Servicio(db.Model):
+    __tablename__ = 'servicio'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(255), nullable=False)
+    descripcion = db.Column(db.Text)
+    precio = db.Column(db.Numeric(10, 2), nullable=False)
+    fecha_vigencia_inicio = db.Column(db.Date, nullable=False)
+    fecha_vigencia_fin = db.Column(db.Date)
+
+class Factura(db.Model):
+    __tablename__ = 'factura'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    fecha = db.Column(db.Date, nullable=False)
+    total = db.Column(db.Numeric(10, 2), nullable=False)
+    paciente_id = db.Column(db.Integer, db.ForeignKey('paciente.id'))
+    tipo = db.Column(db.String(50))
+    cae = db.Column(db.String(50))
+    fecha_vencimiento_cae = db.Column(db.Date)
+    detalles = db.relationship('DetalleFactura', backref='factura', lazy=True)
+
+class DetalleFactura(db.Model):
+    __tablename__ = 'detalle_factura'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    factura_id = db.Column(db.Integer, db.ForeignKey('factura.id'), nullable=False)
+    producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=True)
+    servicio_id = db.Column(db.Integer, db.ForeignKey('servicio.id'), nullable=True)
+    cantidad = db.Column(db.Integer, nullable=False)
+    precio_unitario = db.Column(db.Numeric(10, 2), nullable=False)
+    subtotal = db.Column(db.Numeric(10, 2), nullable=False)

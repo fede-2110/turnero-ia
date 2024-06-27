@@ -16,6 +16,9 @@ from src.schemas.cita_schema import CitaSchema
 from src.schemas.paciente_schema import PacienteSchema
 from src.schemas.practica_schema import PracticaSchema
 from src.schemas.medico_schema import MedicoSchema
+from src.service.facturacion.factura_service import FacturaService
+from src.service.facturacion.producto_service  import ProductoService
+from src.service.facturacion.servicio_service import ServicioService
 
 class ServiceModule(Module):
     @provider
@@ -84,3 +87,17 @@ class ServiceModule(Module):
     @singleton
     def provide_thread_service(self, chat_service: ChatService) -> ThreadService:
         return ThreadService(chat_service)
+    @provider
+    @singleton
+    def provide_producto_service(self, repo: MysqlRepository, uow: UnitOfWork) -> ProductoService:
+        return ProductoService(repo, uow)
+
+    @provider
+    @singleton
+    def provide_servicio_service(self, repo: MysqlRepository, uow: UnitOfWork) -> ServicioService:
+        return ServicioService(repo, uow)
+
+    @provider
+    @singleton
+    def provide_factura_service(self, factura_repo: MysqlRepository, detalle_repo: MysqlRepository, uow: UnitOfWork) -> FacturaService:
+        return FacturaService(factura_repo, detalle_repo, uow)

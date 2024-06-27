@@ -138,3 +138,49 @@ CREATE TABLE IF NOT EXISTS usuario_rol (
     FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE,
     FOREIGN KEY (rol_id) REFERENCES rol(id) ON DELETE CASCADE
 );
+
+-- Tabla de Productos
+CREATE TABLE Productos (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(255) NOT NULL,
+    Descripcion TEXT,
+    Precio DECIMAL(10, 2) NOT NULL,
+    FechaVigenciaInicio DATE NOT NULL,
+    FechaVigenciaFin DATE
+);
+
+-- Tabla de Servicios
+CREATE TABLE Servicios (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(255) NOT NULL,
+    Descripcion TEXT,
+    Precio DECIMAL(10, 2) NOT NULL,
+    FechaVigenciaInicio DATE NOT NULL,
+    FechaVigenciaFin DATE
+);
+
+-- Tabla de Facturas
+CREATE TABLE Facturas (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Fecha DATE NOT NULL,
+    Total DECIMAL(10, 2) NOT NULL,
+    PacienteID INT,
+    Tipo VARCHAR(50),
+    CAE VARCHAR(50),
+    FechaVencimientoCAE DATE,
+    FOREIGN KEY (PacienteID) REFERENCES Pacientes(ID)
+);
+
+-- Tabla de Detalle de Factura
+CREATE TABLE DetalleFactura (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    FacturaID INT,
+    ProductoID INT,
+    ServicioID INT,
+    Cantidad INT NOT NULL,
+    PrecioUnitario DECIMAL(10, 2) NOT NULL,
+    Subtotal DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (FacturaID) REFERENCES Facturas(ID),
+    FOREIGN KEY (ProductoID) REFERENCES Productos(ID),
+    FOREIGN KEY (ServicioID) REFERENCES Servicios(ID)
+);
