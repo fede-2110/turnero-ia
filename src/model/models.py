@@ -134,25 +134,33 @@ Rol.usuarios = db.relationship('UsuarioRol', back_populates='rol')
 
 # Tablas para Facturación
 
-class Producto(db.Model):
-    __tablename__ = 'producto'
+class TipoItem(db.Model):
+    __tablename__ = 'tipo_item'
     
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(255), nullable=False)
-    descripcion = db.Column(db.Text)
-    precio = db.Column(db.Numeric(10, 2), nullable=False)
-    fecha_vigencia_inicio = db.Column(db.Date, nullable=False)
-    fecha_vigencia_fin = db.Column(db.Date)
+    nombre = db.Column(db.String(50), unique=True, nullable=False)
+    items = db.relationship('Item', back_populates='tipo')
 
-class Servicio(db.Model):
-    __tablename__ = 'servicio'
+class Item(db.Model):
+    __tablename__ = 'item'
     
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(255), nullable=False)
+    nombre = db.Column(db.String(255), unique=True, nullable=False)
     descripcion = db.Column(db.Text)
+    tipo_id = db.Column(db.Integer, db.ForeignKey('tipo_item.id'), nullable=False)
+    tipo = db.relationship('TipoItem', back_populates='items')
+    precios_historicos = db.relationship('PrecioHistorico', back_populates='item')
+
+class PrecioHistorico(db.Model):
+    __tablename__ = 'precio_historico'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     precio = db.Column(db.Numeric(10, 2), nullable=False)
     fecha_vigencia_inicio = db.Column(db.Date, nullable=False)
-    fecha_vigencia_fin = db.Column(db.Date)
+    fecha_vigencia_fin = db.Column(db.Date, nullable=False, default=datetime(3000, 12, 31).date())
+    
+    item = db.relationship('Item', back_populates='precios_historicos')
 
 class Factura(db.Model):
     __tablename__ = 'factura'
@@ -171,8 +179,7 @@ class DetalleFactura(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     factura_id = db.Column(db.Integer, db.ForeignKey('factura.id'), nullable=False)
-    producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=True)
-    servicio_id = db.Column(db.Integer, db.ForeignKey('servicio.id'), nullable=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=True)
     cantidad = db.Column(db.Integer, nullable=False)
     precio_unitario = db.Column(db.Numeric(10, 2), nullable=False)
     subtotal = db.Column(db.Numeric(10, 2), nullable=False)

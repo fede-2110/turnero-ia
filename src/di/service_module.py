@@ -15,10 +15,10 @@ from src.repository.mysql_repository import MysqlRepository
 from src.schemas.cita_schema import CitaSchema
 from src.schemas.paciente_schema import PacienteSchema
 from src.schemas.practica_schema import PracticaSchema
+from src.schemas.facturacion.item_schema import ItemSchema
 from src.schemas.medico_schema import MedicoSchema
 from src.service.facturacion.factura_service import FacturaService
-from src.service.facturacion.producto_service  import ProductoService
-from src.service.facturacion.servicio_service import ServicioService
+from src.service.facturacion.item_service import ItemService
 
 class ServiceModule(Module):
     @provider
@@ -88,14 +88,8 @@ class ServiceModule(Module):
     def provide_thread_service(self, chat_service: ChatService) -> ThreadService:
         return ThreadService(chat_service)
     @provider
-    @singleton
-    def provide_producto_service(self, repo: MysqlRepository, uow: UnitOfWork) -> ProductoService:
-        return ProductoService(repo, uow)
-
-    @provider
-    @singleton
-    def provide_servicio_service(self, repo: MysqlRepository, uow: UnitOfWork) -> ServicioService:
-        return ServicioService(repo, uow)
+    def provide_producto_service(self, repo: MysqlRepository, uow: UnitOfWork, schema: ItemSchema) -> ItemService:
+        return ItemService(repo, uow, schema)
 
     @provider
     @singleton

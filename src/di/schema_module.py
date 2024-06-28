@@ -4,7 +4,7 @@ from src.schemas.paciente_schema import PacienteSchema
 from src.schemas.practica_schema import PracticaSchema
 from src.schemas.cita_schema import CitaSchema
 from src.schemas.medico_schema import MedicoSchema
-from src.schemas.facturacion import ProductoSchema, ServicioSchema, FacturaSchema, DetalleFacturaSchema
+from src.schemas.facturacion import ItemSchema, FacturaSchema, DetalleFacturaSchema
 
 class SchemaModule(Module):
     @provider
@@ -29,13 +29,8 @@ class SchemaModule(Module):
 
     @provider
     @singleton
-    def provide_producto_schema(self) -> ProductoSchema:
-        return ProductoSchema()
-
-    @provider
-    @singleton
-    def provide_servicio_schema(self) -> ServicioSchema:
-        return ServicioSchema()
+    def provide_item_schema(self) -> ItemSchema:
+        return ItemSchema()
 
     @provider
     @singleton
