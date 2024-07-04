@@ -19,6 +19,9 @@ from src.schemas.facturacion.item_schema import ItemSchema
 from src.schemas.medico_schema import MedicoSchema
 from src.service.facturacion.factura_service import FacturaService
 from src.service.facturacion.item_service import ItemService
+from src.service.facturacion.afip_service import AFIPService
+import os
+from pyafipws.wsaa import WSAA
 
 class ServiceModule(Module):
     @provider
@@ -95,3 +98,18 @@ class ServiceModule(Module):
     @singleton
     def provide_factura_service(self, factura_repo: MysqlRepository, detalle_repo: MysqlRepository, uow: UnitOfWork) -> FacturaService:
         return FacturaService(factura_repo, detalle_repo, uow)
+    
+    @singleton
+    @provider
+    def provide_wsaa(self) -> WSAA:
+        return WSAA()
+    
+    @singleton
+    @provider
+    def provide_afip_service(self) -> AFIPService:
+        # Proporcionar los valores necesarios para inicializar AFIPService
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        cert_path = os.path.join(base_dir, 'certs', 'cert.crt')
+        key_path = os.path.join(base_dir, 'certs', 'private.key')
+        cuit = '27-36086640-3'
+        return AFIPService(cuit, cert_path, key_path)

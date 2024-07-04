@@ -12,3 +12,4 @@ hypercorn===0.16.0
 injector===0.21.0
 cryptography===42.0.8
 flask-Injector===0.15.0
+PyAfipWs===3.12.3045
